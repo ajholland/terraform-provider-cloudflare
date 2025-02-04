@@ -274,12 +274,6 @@ func resourceCloudflareAccessApplicationSchema() map[string]*schema.Schema {
 												Required:    true,
 												Description: "The name of the attribute as provided by the IDP.",
 											},
-											"name_by_idp": {
-												Type:        schema.TypeMap,
-												Optional:    true,
-												Description: "A mapping from IdP ID to claim name.",
-												Elem:        &schema.Schema{Type: schema.TypeString},
-											},
 										},
 									},
 								},
@@ -360,12 +354,6 @@ func resourceCloudflareAccessApplicationSchema() map[string]*schema.Schema {
 												Type:        schema.TypeString,
 												Required:    true,
 												Description: "The name of the attribute as provided by the IDP.",
-											},
-											"name_by_idp": {
-												Type:        schema.TypeMap,
-												Optional:    true,
-												Description: "A mapping from IdP ID to claim name.",
-												Elem:        &schema.Schema{Type: schema.TypeString},
 											},
 										},
 									},
@@ -816,14 +804,6 @@ func convertCORSStructToSchema(d *schema.ResourceData, headers *cloudflare.Acces
 	return []interface{}{m}
 }
 
-func convertNameByIDP(source map[string]interface{}) map[string]string {
-	nameByIDP := make(map[string]string)
-	for k, v := range source {
-		nameByIDP[k] = v.(string)
-	}
-	return nameByIDP
-}
-
 func convertSAMLAttributeSchemaToStruct(data map[string]interface{}) cloudflare.SAMLAttributeConfig {
 	var cfg cloudflare.SAMLAttributeConfig
 	cfg.Name, _ = data["name"].(string)
@@ -835,8 +815,6 @@ func convertSAMLAttributeSchemaToStruct(data map[string]interface{}) cloudflare.
 		sourceMap, ok := sourcesSlice[0].(map[string]interface{})
 		if ok {
 			cfg.Source.Name, _ = sourceMap["name"].(string)
-			nameByIDPInterface, _ := sourceMap["name_by_idp"].(map[string]interface{})
-			cfg.Source.NameByIDP = convertNameByIDP(nameByIDPInterface)
 		}
 	}
 	return cfg
@@ -852,8 +830,6 @@ func convertOIDCClaimSchemaToStruct(data map[string]interface{}) cloudflare.OIDC
 		sourceMap, ok := sourcesSlice[0].(map[string]interface{})
 		if ok {
 			cfg.Source.Name, _ = sourceMap["name"].(string)
-			nameByIDPInterface, _ := sourceMap["name_by_idp"].(map[string]interface{})
-			cfg.Source.NameByIDP = convertNameByIDP(nameByIDPInterface)
 		}
 	}
 
@@ -1110,7 +1086,7 @@ func convertSAMLAttributeStructToSchema(attr cloudflare.SAMLAttributeConfig) map
 		m["friendly_name"] = attr.FriendlyName
 	}
 	if attr.Source.Name != "" {
-		m["source"] = []interface{}{map[string]interface{}{"name": attr.Source.Name, "name_by_idp": attr.Source.NameByIDP}}
+		m["source"] = []interface{}{map[string]interface{}{"name": attr.Source.Name}}
 	}
 	return m
 }
@@ -1127,7 +1103,7 @@ func convertOIDCClaimStructToSchema(attr cloudflare.OIDCClaimConfig) map[string]
 		m["required"] = true
 	}
 	if attr.Source.Name != "" {
-		m["source"] = []interface{}{map[string]interface{}{"name": attr.Source.Name, "name_by_idp": attr.Source.NameByIDP}}
+		m["source"] = []interface{}{map[string]interface{}{"name": attr.Source.Name}}
 	}
 
 	return m

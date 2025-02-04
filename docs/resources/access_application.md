@@ -185,10 +185,6 @@ Required:
 
 - `name` (String) The name of the attribute as provided by the IDP.
 
-Optional:
-
-- `name_by_idp` (Map of String) A mapping from IdP ID to claim name.
-
 
 
 <a id="nestedblock--saas_app--custom_claim"></a>
@@ -210,10 +206,6 @@ Optional:
 Required:
 
 - `name` (String) The name of the attribute as provided by the IDP.
-
-Optional:
-
-- `name_by_idp` (Map of String) A mapping from IdP ID to claim name.
 
 
 
